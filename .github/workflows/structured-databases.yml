@@ -1,0 +1,71 @@
+name: Structured databases
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches: ['release']
+
+concurrency:
+  group: structured-databases-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - php: '8.2'
+            database: mysql:8.4
+            health: mysqladmin ping --silent
+          - php: '8.3'
+            database: mariadb:11.8.9
+            health: healthcheck.sh --connect --innodb_initialized
+    services:
+      database:
+        image: ${{ matrix.database }}
+        env:
+          MYSQL_DATABASE: bookstack-test
+          MYSQL_USER: bookstack-test
+          MYSQL_PASSWORD: bookstack-test
+          MYSQL_ROOT_PASSWORD: test-root-password
+        ports:
+          - 3306/tcp
+        options: >-
+          --health-cmd="${{ matrix.health }}"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=30
+    env:
+      APP_KEY: base64:rt54sY5s5G9+8VmvfI0NIJs2Fzd3qsx4auLjnLE5qw0=
+      APP_URL: http://localhost
+      STRUCTURED_DATABASES_ENABLED: 'false'
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: shivammathur/setup-php@d52fc211a0436f8839a587b3b5b8efddab4744ea # v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: gd, mbstring, curl, xml, dom, pdo_mysql, ldap, zip
+          coverage: none
+          tools: composer:v2
+      - name: Configure isolated test database
+        run: echo "TEST_DATABASE_URL=mysql://bookstack-test:bookstack-test@127.0.0.1:${{ job.services.database.ports[3306] }}/bookstack-test" >> "$GITHUB_ENV"
+      - name: Install locked dependencies
+        run: composer install --no-interaction --prefer-dist
+      - name: Migrate and seed
+        run: composer refresh-test-database
+      - name: Verify structured migration rollback and reapply
+        run: |
+          php artisan migrate:rollback --database=mysql_testing --step=1 --force
+          php artisan migrate --database=mysql_testing --force
+      - name: Run all PHP tests
+        run: vendor/bin/phpunit --colors=never
+      - name: Check custom PHP style and types
+        run: |
+          vendor/bin/phpcs app/Databases app/Config/structured-databases.php database/migrations/2026_10_26_000001_create_structured_databases.php tests/Databases --parallel=2
+          vendor/bin/phpstan analyse app/Databases --memory-limit=1G --no-progress

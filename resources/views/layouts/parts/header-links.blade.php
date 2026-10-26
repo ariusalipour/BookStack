@@ -7,6 +7,9 @@
            data-shortcut="shelves_view">@icon('bookshelf'){{ trans('entities.shelves') }}</a>
     @endif
     <a href="{{ url('/books') }}" data-shortcut="books_view">@icon('books'){{ trans('entities.books') }}</a>
+    @if(config('structured-databases.enabled') && !user()->isGuest())
+        <a href="{{ url('/databases') }}">@icon('grid'){{ trans('databases.title') }}</a>
+    @endif
     @if(!user()->isGuest() && userCan(\BookStack\Permissions\Permission::SettingsManage))
         <a href="{{ url('/settings') }}"
            data-shortcut="settings_view">@icon('settings'){{ trans('settings.settings') }}</a>

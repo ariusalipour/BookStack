@@ -22,6 +22,15 @@ use Illuminate\Support\Facades\Route;
 
 // Main Entity Routes
 
+Route::get('databases', [\BookStack\Databases\DatabaseController::class, 'index']);
+Route::post('databases', [\BookStack\Databases\DatabaseController::class, 'store']);
+Route::get('databases/{databaseId}', [\BookStack\Databases\DatabaseController::class, 'show']);
+Route::post('databases/{databaseId}/fields', [\BookStack\Databases\DatabaseController::class, 'storeField']);
+Route::post('databases/{databaseId}/records', [\BookStack\Databases\DatabaseController::class, 'storeRecord']);
+Route::put('databases/{databaseId}/records/{recordId}', [\BookStack\Databases\DatabaseController::class, 'updateRecord']);
+Route::delete('databases/{databaseId}/records/{recordId}', [\BookStack\Databases\DatabaseController::class, 'destroyRecord']);
+Route::get('databases/{databaseId}/export', [\BookStack\Databases\DatabaseController::class, 'export']);
+
 Route::get('pages', [EntityControllers\PageApiController::class, 'list']);
 Route::post('pages', [EntityControllers\PageApiController::class, 'create']);
 Route::get('pages/{id}', [EntityControllers\PageApiController::class, 'read']);

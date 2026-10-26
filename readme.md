@@ -1,5 +1,7 @@
 # BookStack
 
+This fork is developing **experimental structured databases with page-backed records, relations and rollups** on the v26.09.2 release. The feature is opt-in and is not yet a complete workspace replacement. See the [implementation guide and remaining milestones](dev/docs/structured-databases.md). Please report fork-specific issues to this fork rather than upstream BookStack.
+
 [![Codeberg release](https://img.shields.io/gitea/v/release/bookstack/bookstack.svg?gitea_url=https://codeberg.org)](https://codeberg.org/bookstack/bookstack/releases/latest)
 [![license](https://img.shields.io/badge/License-MIT-yellow.svg)](https://codeberg.org/bookstack/bookstack/src/branch/development/LICENSE)
 [![Crowdin](https://badges.crowdin.net/bookstack/localized.svg)](https://crowdin.com/project/bookstack)
