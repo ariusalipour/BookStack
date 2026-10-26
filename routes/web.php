@@ -33,6 +33,17 @@ Route::get('/opensearch.xml', [MetaController::class, 'opensearch']);
 // Authenticated routes...
 Route::middleware('auth')->group(function () {
 
+    // Structured databases (experimental fork feature).
+    Route::get('/databases', [\BookStack\Databases\DatabaseController::class, 'index']);
+    Route::post('/databases', [\BookStack\Databases\DatabaseController::class, 'store']);
+    Route::get('/databases/{databaseId}', [\BookStack\Databases\DatabaseController::class, 'show']);
+    Route::post('/databases/{databaseId}/fields', [\BookStack\Databases\DatabaseController::class, 'storeField']);
+    Route::post('/databases/{databaseId}/records', [\BookStack\Databases\DatabaseController::class, 'storeRecord']);
+    Route::get('/databases/{databaseId}/records/{recordId}/edit', [\BookStack\Databases\DatabaseController::class, 'editRecord']);
+    Route::put('/databases/{databaseId}/records/{recordId}', [\BookStack\Databases\DatabaseController::class, 'updateRecord']);
+    Route::delete('/databases/{databaseId}/records/{recordId}', [\BookStack\Databases\DatabaseController::class, 'destroyRecord']);
+    Route::get('/databases/{databaseId}/export', [\BookStack\Databases\DatabaseController::class, 'export']);
+
     // Secure images routing
     Route::get('/uploads/images/{path}', [UploadControllers\ImageController::class, 'showImage'])
         ->where('path', '.*$');

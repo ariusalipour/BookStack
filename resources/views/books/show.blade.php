@@ -25,6 +25,12 @@
 
     <main class="content-wrap card">
         <h1 class="break-text">{{$book->name}}</h1>
+        @if(config('structured-databases.enabled') && !user()->isGuest())
+            @php($structuredDatabase = \BookStack\Databases\StructuredDatabase::query()->where('book_id', $book->id)->first())
+            @if($structuredDatabase)
+                <p><a class="button outline" href="{{ url('/databases/' . $structuredDatabase->id) }}">{{ trans('databases.title') }}: {{ $structuredDatabase->name }}</a></p>
+            @endif
+        @endif
         <div refs="entity-search@contentView" class="book-content">
             <div class="text-muted break-text">{!! $book->descriptionInfo()->getHtml() !!}</div>
             @if(count($bookChildren) > 0)
