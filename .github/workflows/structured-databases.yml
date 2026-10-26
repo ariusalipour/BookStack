@@ -54,8 +54,11 @@ jobs:
           extensions: gd, mbstring, curl, xml, dom, pdo_mysql, ldap, zip
           coverage: none
           tools: composer:v2
-      - name: Configure isolated test database
-        run: echo "TEST_DATABASE_URL=mysql://bookstack-test:bookstack-test@127.0.0.1:${{ job.services.database.ports[3306] }}/bookstack-test" >> "$GITHUB_ENV"
+      - name: Configure isolated test environment
+        run: |
+          echo "TEST_DATABASE_URL=mysql://bookstack-test:bookstack-test@127.0.0.1:${{ job.services.database.ports[3306] }}/bookstack-test" >> "$GITHUB_ENV"
+          mkdir -p "$RUNNER_TEMP/bookstack-tests"
+          echo "TMPDIR=$RUNNER_TEMP/bookstack-tests" >> "$GITHUB_ENV"
       - name: Install locked dependencies
         run: composer install --no-interaction --prefer-dist
       - name: Migrate and seed
